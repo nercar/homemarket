@@ -1,0 +1,719 @@
+<!-- Main row -->
+<div class="row">
+	<!-- Auditoria de Costos -->
+	<div class="col-md-12 col-sm-12 mt-2" id="div_tbl_datos">
+		<div class="card card-primary m-0 p-0 elevation-2 border border-dark">
+			<div class="card-header d-flex p-1 pl-2 mb-1 align-items-baseline">
+				<i class="fas fa-cart-plus"></i>&nbsp;
+				<span id="ttitulo">Cargar Existencia</span>
+			</div>
+			<div class="row m-0 pl-1 pr-1 pb-1">
+				<div class="bg-dark-gradient text-center col-12">Datos del Artículo a Cargar Existencia</div>
+			</div>
+			<div class="row pl-1 pr-1 m-0">
+				<table class="col-12 txtcomp">
+					<thead>
+						<tr>
+							<th class="font-weight-bold text-center m-0 p-0" width="10%">Código</th>
+							<th class="font-weight-bold text-center m-0 p-0" width="30%" style="padding-right: 5px;">Descripción Artículo</th>
+							<th class="font-weight-bold text-center m-0 p-0" width="30%" style="border-left: 1px solid; padding-left: 5px;">Almacén</th>
+							<th class="font-weight-bold text-center m-0 p-0" width="10%">Cantidad</th>
+							<th class="font-weight-bold text-center m-0 p-0" width="20%">Permitido sin Exist.</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="mt-0 mb-0 pb-0 pt-0" style="padding-right: 5px;">
+								<input type="number" id="codigo" onfocus="$(this).select()"
+									placeholder="Código a buscar" tabindex="1"
+									onchange="lstArticulos()"
+									class="txtcomp form-control form-control-sm">
+							</td>
+							<td class="mt-0 mb-0 pb-0 pt-0" style="padding-right: 5px;">
+								<input type="text" id="descripcion" onfocus="$(this).select()"
+									placeholder="Nombre total/parcial del Artículo buscar"
+									onchange="lstArticulos()" tabindex="2"
+									class="txtcomp form-control form-control-sm">
+							</td>
+							<td class="mt-0 mb-0 pb-0 pt-0" style="border-left: 1px solid; padding-left: 5px;">
+								<select id="select_almacenes" class="form-control form-control-sm" tabindex="4"
+								style="height: 27px !important;"></select>
+							</td>
+							<td class="mt-0 mb-0 pb-0 pt-0">
+								<input type="number" id="cantidad" onfocus="$(this).select()" min="1"pattern="^[0-9]+"
+									style="height: 27px !important;" tabindex="5"
+									placeholder="Cantidad a Cargar" class="text-right form-control form-control-sm">
+							</td>
+							<td class="mt-0 mb-0 pb-0 pt-0">
+								<input type="number" id="permitido" onfocus="$(this).select()" min="0" pattern="^[0-9]+"
+									style="height: 27px !important;" tabindex="6"
+									placeholder="Permitir sin Existencia" class="text-right form-control form-control-sm">
+							</td>
+						</tr>
+						<tr>
+							<td>&emsp;</td>
+							<td class="text-right" style="padding-right: 5px;">
+								<button style="height: 30px;" class="btn btn-sm btn-primary mt-1" onclick="lstArticulos()" tabindex="3">
+									<i class="fas fa-search"></i> Consultar
+								</button>
+							</td>
+							<td colspan="3" class="text-right" style="border-left: 1px solid; padding-left: 5px;">
+								<button style="height: 30px;" class="btn btn-sm btn-info mt-1 ml-1 mr-1" onclick="limpiar()" tabindex="8">
+									<i class="fas fa-broom"></i> Limpiar
+								</button>
+								<button style="height: 30px;" class="btn btn-sm btn-warning mt-1" onclick="agregarArtTMP()" tabindex="7" >
+									<i class="fas fa-arrow-alt-circle-down"></i> Agregar
+								</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<hr class="m-1 border-dark">
+			<div class="col-12">
+				<table width="100%" id="artXCargar" cellpadding="0" cellspacing="0"
+					class="table-striped table-hover table-bordered m-0 p-0">
+					<thead>
+						<tr class="bg-warning-gradient">
+							<th width="10%" class="text-center txtcomp p-0 m-0">Código</th>
+							<th width="35%" class="text-center txtcomp p-0 m-0">Descripción</th>
+							<th width="25%" class="text-center txtcomp p-0 m-0">Almacén</th>
+							<th width="10%" class="text-center txtcomp p-0 m-0">Cantidad</th>
+							<th width="10%" class="text-center txtcomp p-0 m-0">Permitido</th>
+							<th width="10%" class="text-center txtcomp p-0 m-0">Opciones</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+					<tfoot>
+						<tr>
+							<td colspan="6" class="p-0 pt-1 text-left">
+								<button class="btn btn-sm btn-danger" onclick="cancelarProceso()">
+									<i class="fas fa-times"></i> Cancelar
+								</button>
+								&emsp;
+								<button class="btn btn-sm btn-success" onclick="cargarExixtencia()">
+									<i class="fas fa-save"></i> Procesar Artículos
+								</button>
+							</td>
+						</tr>
+					</tfoot>
+				</table>
+			</div>
+			<!-- /.card-body -->
+		</div>
+	</div>
+	<!-- /.col -->
+</div>
+<!-- /.row (main row 2) -->
+
+<!-- Modal lista de articulos -->
+<div class="modal fade" id="TblBuscarArt" style="z-index: 9888;" tabindex="-1" role="dialog" aria-labelledby="TblBuscarArtLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xl modal-dialog-centered">
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header bg-primary m-0 p-0 pl-1">
+				<h5 class="modal-title font-weight-bold">Seleccione un Artículo para Agregar</h5>
+				<button type="button" data-dismiss="modal" aria-label="Close" class="btn btn-danger btn-lg float-right">
+					<span class="fas fa-window-close float-right" aria-hidden="true"></span>
+				</button>
+			</div>
+			<div class="modal-body p-1" id="contTblBuscarArt">
+				<form action="" onsubmit="return false;" class="form-inline col-12 p-0 m-0 mt-2">
+					<div class="d-flex w-100 align-content-center justify-content-center ml-2 mr-2">
+						<span class="col-1 font-weight-bold">Buscar: </span>
+						<input type="text" class="form-control form-control-sm m-0 ml-1 mr-l p-1 col-11"
+							id="buscarTblBuscarArt" value="" autocomplete="off"
+							placeholder="Buscar Artículo en la Lista...">
+					</div>
+				</form>
+				<table id="listaArticulos" class="w-100 table table-striped table-hover table-bordered">
+					<thead>
+						<tr>
+							<th width="10%" class="text-center txtcomp bg-dark-gradient">Código</th>
+							<th width="50%" class="text-center txtcomp bg-dark-gradient">Descripción</th>
+							<th width="20%" class="text-center txtcomp bg-dark-gradient">Alamcen</th>
+							<th width="10%" class="text-center txtcomp bg-dark-gradient">Disponible</th>
+							<th width="10%" class="text-center txtcomp bg-dark-gradient">Permitido</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal lista de articulos -->
+<div class="modal fade" id="modalEditRow" style="z-index: 9888;" tabindex="-1" role="dialog" aria-labelledby="modalEditRowLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header bg-primary m-0 p-0 pl-1">
+				<h5 class="modal-title font-weight-bold">Ingrese los valores nuevos para</h5>
+			</div>
+			<div class="modal-body p-1" id="contmodalEditRow">
+				<label for="codigoEditRow">Código</label>
+				<span id="codigoEditRow"></span>
+				<br>
+				<label for="descripcionEditRow">Desripción del Artículo</label>
+				<span class="txtcomp" id="descripcionEditRow"></span>
+				<hr class="m-1 border-dark">
+				<table class="table col-12">
+					<tr>
+						<th class="font-weight-bold text-center m-0 p-0" width="30%">Almacén</th>
+						<th class="font-weight-bold text-center m-0 p-0" width="10%">Cantidad</th>
+						<th class="font-weight-bold text-center m-0 p-0" width="20%">Permitido sin Exist.</th>
+					</tr>
+					<tr>
+						<td class="mt-0 mb-0 pb-0 pt-0">
+							<select id="select_almacenes_editRow" class="form-control form-control-sm"
+							style="height: 27px !important;"></select>
+						</td>
+						<td class="mt-0 mb-0 pb-0 pt-0">
+							<input type="number" id="cantidadEditRow" onfocus="$(this).select()" min="1"pattern="^[0-9]+"
+								style="height: 27px !important;"
+								placeholder="Cantidad a Cargar" class="text-right form-control form-control-sm">
+						</td>
+						<td class="mt-0 mb-0 pb-0 pt-0">
+							<input type="number" id="permitidoEditRow" onfocus="$(this).select()" min="0" pattern="^[0-9]+"
+								style="height: 27px !important;"
+								placeholder="Permitir sin Existencia" class="text-right form-control form-control-sm">
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="modal-footer pt-2 pb-2 align-items-end justify-content-end align-top">
+				<button class="btn btn-sm btn-danger" class="close" data-dismiss="modal" id="btncerrar">
+					Cerrar <i class="fas fa-times-circle"></i>
+				</button>
+				<button style="height: 30px;" class="btn btn-sm btn-warning" onclick="modificarArtTMP()">
+					<i class="fas fa-arrow-alt-circle-down"></i> Modificar
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	var cabecera = new Array();
+	var detalle = new Array();
+	var data = new Array();
+	var localidad = 0;
+	var organizacion = 0;
+	var topTabla = $('#artXCargar').offset().top;
+
+	$('.gfechas').datepicker({
+		format: "dd-mm-yyyy",
+		todayBtn: "linked",
+		language: "es",
+		autoclose: true,
+		todayHighlight: true,
+		endDate: "0d",
+	});
+	$('.input-daterange input').each(function() {
+		if($(this).data('id') == 'fechai')
+			// $(this).datepicker("setDate", moment().startOf('month').format('DD-MM-YYYY'));
+			$(this).datepicker("setDate", moment().startOf('month').format('DD-MM-YYYY'));
+		if($(this).data('id') == 'fechaf')
+			$(this).datepicker("setDate", moment().format('DD-MM-YYYY'));
+	});
+
+	$.ajax({
+		url: "app/controller/cargar_inventario.php",
+		data: {
+			opcion: "almacenes",
+		},
+		type: "POST",
+		dataType: "json",
+		success : function(data) {
+			localidad = data[0].LOCALIDAD
+			$("#select_almacenes").append('<option value="0">Seleccione un Almácen</option>');
+			$("#select_almacenes_editRow").append('<option value="0">Seleccione un Almácen</option>');
+			$.each(data, function(i, e) {
+				$("#select_almacenes").append('<option value="'+ (e.LOCALIDAD+e.CODIGO) + '">' + e.DESCRIPCION + '</option>');
+				$("#select_almacenes_editRow").append('<option value="'+ (e.LOCALIDAD+e.CODIGO) + '">' + e.DESCRIPCION + '</option>');
+			})
+		},
+	});
+
+	$('#artXCargar').DataTable({
+		scrollY: $(window).height()-topTabla-($(window).height()*0.17),
+		scrollCollapse: false,
+		autoWidth: false,
+		searching: true,
+		processing: false,
+		ordering: false,
+		ajax: {
+			url: "app/controller/cargar_inventario.php",
+			data: {
+				opcion: "articulosXCargar",
+				usuario: $('#uilogin').val()
+			},
+			type: "POST",
+			dataType: "json",
+		},
+		columns: [
+			{ data: 'codigo',      sClass: "text-left" },
+			{ data: 'descripcion', sClass: "text-left" },
+			{ data: 'almacen',     sClass: "text-left" },
+			{ data: 'cantidad',    sClass: "text-right", render: $.fn.dataTable.render.number(",", ".", 2) },
+			{ data: 'permitido',   sClass: "text-right", render: $.fn.dataTable.render.number(",", ".", 2) },
+			{ data: null,          sClass:"text-center m-0 p-0",
+				render: function(data) {
+					txt = data.codigo+','+"'"+data.descripcion+"',"+"'"+data.idalmacen+"','"+data.almacen+"',"+data.cantidad+','+data.permitido;
+					txt = '<div class="w-100">'+
+							'<i class="mr-2 fas fa-lg fa-trash-alt text-danger" style="cursor: pointer;" id="elim'+data.codigo+'" title="Borrar"'+
+							' onclick="btnRowElim('+ txt +')"></i>'+
+							'<i class="fas fa-lg fa-edit text-primary" style="cursor: pointer;" id="edit'+data.codigo+'" title="Editar"'+
+							' onclick="btnRowEdit('+ txt +')"></i>'+
+						'</div>';
+					return txt;
+				}
+			}
+		],
+		rowCallback: function( row, data, index ) {
+			if($('#movil').val()==1) {
+				var row = $('#artXCargar').DataTable().row( row );
+				row.child( infoextra(data) ).show();
+				$(this).addClass('txtcomp');
+			}
+		},
+		initComplete: function() {
+			$('#artXCargar').DataTable().column(2).visible( $('#movil').val()==0 );
+			$('#artXCargar').DataTable().column(4).visible( $('#movil').val()==0 );
+		}
+	})
+
+	$('#codigo').focus().select();
+
+	$('.modal').modal({backdrop: 'static', keyboard: false, show: false});
+
+	$('.modal').on('hidden.bs.modal', function() {
+		// se restaura el index del backdrop
+		$('.modal-backdrop').css('zIndex', 8888);
+	});
+
+	$('input').on('keyup', function(event) {
+		if(event.keyCode>=97 && event.keyCode <=122) {
+			return String.fromCharCode(event.Keycode).toUpperCase()
+		}
+	});
+
+	$('input').on('blur', function(event) {
+		// Convertir a mayusculas al salir del campo
+		$(this).val( $(this).val().toUpperCase() )
+	});
+
+	$("#buscarTblBuscarArt").keyup(function(e) {
+		// Buscar en la tabla
+		$('#listaArticulos').dataTable().fnFilter(this.value);
+	});
+
+	$('#TblBuscarArt').on('shown.bs.modal', function() {
+		// buscar
+		$("#buscarTblBuscarArt").val('').focus();
+	});
+
+	if($('#movil').val()==1) {
+		// Ir arriba atomaticamente
+		$("html, body").animate({ scrollTop: 0 }, "slow");
+	}
+
+	$(window).on('resize', ()=> {
+		if($('#artXCargar').is(':visible') && $('#movil').val()==0) {
+			setTimeout(()=>{
+				$('#artXCargar').DataTable({
+					scrollY: $(window).height()-topTabla-($(window).height()*0.17)
+				}).columns.adjust() }, 150);
+		}
+	})
+
+	function lstArticulos() {
+		if($('#codigo').val()!='' || $('#descripcion').val().trim()!='') {
+			cargando('show');
+			tomar_datos = $.ajax({
+				url: "app/controller/cargar_inventario.php",
+				data: {
+					opcion: "listaArticulos",
+					codigo: $('#codigo').val(),
+					nombre: $('#descripcion').val().trim(),
+				},
+				type: "POST",
+				dataType: "json",
+				success : function(data) {
+					if(data.length>1){
+						$("#listaArticulos").dataTable({
+							scrollY: "60vh",
+							scrollCollapse: false,
+							order: [1, 'asc'],
+							searching: true,
+							data: data,
+							columns: [
+								{ data: 'codigo' },
+								{ data: 'descripcion' },
+								{ data: 'almacen' },
+								{ data: 'disponible', render: $.fn.dataTable.render.number(",", ".", 2) },
+								{ data: 'permitido', render: $.fn.dataTable.render.number(",", ".", 2) },
+							],
+							rowCallback: function(row, data) {
+								if($('#movil').val()==1) {
+									var row = $('#listaArticulos').DataTable().row( row );
+									row.child( data.descripcion ).show();
+									$(this).addClass('txtcomp');
+								}
+							},
+							initComplete: function() {
+								$('#listaArticulos').DataTable().column(1).visible( $('#movil').val()==0 )
+								$('#TblBuscarArt').modal('show');
+								setTimeout(function() {
+									var table = $('#listaArticulos').DataTable();
+									$('#contTblBuscarArt').css( 'display', 'block' );
+									table.columns.adjust().draw();
+								}, 150);
+							}
+						});
+					} else if(data.length==1) {
+						selArt(
+							data[0].codigo,
+							data[0].descriptxt,
+							data[0].cod_almacen,
+							data[0].disponible,
+							data[0].permitido,
+						)
+					} else {
+						msg.fire({
+							title: 'No Existe!!!',
+							icon: 'error',
+							html: 'Artículo No Existe!!!',
+							showCancelButton: false,
+							onAfterClose: function() {
+								$('#codigo').focus().select();
+							}
+						})
+					}
+				}
+			}).done(function() { cargando('hide'); })
+		} else {
+			$('#codigo').focus().select();
+		}
+	}
+
+	function limpiar() {
+		$('#codigo').val([]);
+		$('#descripcion').val([]);
+		$('#select_almacenes').val(0);
+		$('#permitido').val([]);
+		$('#codigoEditRow').val([]);
+		$('#descripcionEditRow').val([]);
+		$('#select_almacenes_editRow').val(0);
+		$('#permitidoEditRow').val([]);
+		$('#modalEditRow').modal('hide');
+		setTimeout(function() {
+			$('#codigo').focus().select();
+		}, 150);
+	}
+
+	function agregarArtTMP() {
+		if(validar()) {
+			$.ajax({
+				url: "app/controller/cargar_inventario.php",
+				data: {
+					opcion: "agregarArtTMP",
+					usuario: $('#uilogin').val(),
+					codigo: $('#codigo').val(),
+					descripcion: $('#descripcion').val(),
+					almacen: $('#select_almacenes').val(),
+					cantidad: $('#cantidad').val()*1,
+					permitido: $('#permitido').val()*1,
+				},
+				type: "POST",
+				dataType: "text",
+				success : function(data) {
+					if(data==1) {
+						$('#artXCargar').DataTable().ajax.reload();
+						limpiar();
+					} else {
+						msg.fire({
+							title: '!!! A T E N C I Ó N ¡¡¡',
+							icon: 'error',
+							html: 'Se presentó un error, intente de nuevo.<br>'+data,
+							showCancelButton: false,
+						})
+					}
+				}
+			})
+		}
+	}
+
+	function btnRowElim(codigo, descripcion, idalmacen, almacen, cantidad, permitido) {
+		msg.fire({
+			title: '!!! A T E N C I Ó N ¡¡¡',
+			icon: 'question',
+			html: 'Desea <b>Eliminar</b> la siguiente información de la lista<br><br>'+
+					'<div class="w-100 text-left txtcomp">'+
+					'<b>Código: </b>'+codigo+'<br>'+
+					'<b>Descripción: </b>'+descripcion+'<br>'+
+					'<b>Almacén: </b>'+almacen+'<br>'+
+					'<b>Cantidad: </b>'+(cantidad*1).toFixed(2)+'&emsp;'+
+					'<b>Permitido: </b>'+(permitido*1).toFixed(2)+
+					'</div>',
+			onOpen: function() { $('.swal2-cancel').focus() },
+		}).then((result) => {
+			if (result.value) {
+				$.ajax({
+					url: "app/controller/cargar_inventario.php",
+					data: {
+						opcion: "eliminarArtTMP",
+						usuario: $('#uilogin').val(),
+						codigo: codigo,
+					},
+					type: "POST",
+					dataType: "text",
+					success : function(data) {
+						if(data==1) {
+							$('#artXCargar').DataTable().ajax.reload();
+							limpiar();
+						} else {
+							msg.fire({
+								title: '!!! A T E N C I Ó N ¡¡¡',
+								icon: 'error',
+								html: 'Se presentó un error, intente de nuevo.<br>'+data,
+								showCancelButton: false,
+							})
+						}
+					}
+				})
+			}
+		})
+	}
+
+	function btnRowEdit(codigo, descripcion, idalmacen, almacen, cantidad, permitido) {
+		$('#codigoEditRow').html(codigo);
+		$('#descripcionEditRow').html(descripcion);
+		$('#select_almacenes_editRow').val(idalmacen);
+		$('#cantidadEditRow').val(cantidad);
+		$('#permitidoEditRow').val(permitido);
+		$('#modalEditRow').modal('show');
+	}
+
+	function modificarArtTMP() {
+		$.ajax({
+			url: "app/controller/cargar_inventario.php",
+			data: {
+				opcion: "modificarArtTMP",
+				usuario: $('#uilogin').val(),
+				codigo: $('#codigoEditRow').html(),
+				almacen: $('#select_almacenes_editRow').val(),
+				cantidad: $('#cantidadEditRow').val(),
+				permitido: $('#permitidoEditRow').val(),
+			},
+			type: "POST",
+			dataType: "text",
+			success : function(data) {
+				if(data==1) {
+					$('#artXCargar').DataTable().ajax.reload();
+					limpiar();
+				} else {
+					msg.fire({
+						title: '!!! A T E N C I Ó N ¡¡¡',
+						icon: 'error',
+						html: 'Se presentó un error, intente de nuevo.<br>'+data,
+						showCancelButton: false,
+					})
+				}
+			}
+		})
+	}
+
+	function cancelarProceso() {
+		if($('#artXCargar').DataTable().rows().count()>0) {
+			msg.fire({
+				title: '!!! A T E N C I Ó N ¡¡¡',
+				icon: 'warning',
+				html: 'Seguro que desea cancelar el proceso actual,<br>se descartará toda la información ingresada',
+				onOpen: function() { $('.swal2-cancel').focus() },
+			}).then((result) => {
+				if (result.value) {
+					var codigo = [];
+					$('#artXCargar').DataTable().rows().data().each(function(data){
+						codigo.push(data.codigo)
+					})
+					$.ajax({
+						url: "app/controller/cargar_inventario.php",
+						data: {
+							opcion: "cancelarProceso",
+							usuario: $('#uilogin').val(),
+							codigo: codigo.toString(),
+						},
+						type: "POST",
+						dataType: "text",
+						success : function(data) {
+							if(data==1) {
+								cargarcontenido('cargar_inventario');
+							} else {
+								msg.fire({
+									title: '!!! A T E N C I Ó N ¡¡¡',
+									icon: 'error',
+									html: 'Se presentó un error, intente de nuevo.<br>'+data,
+									showCancelButton: false,
+								})
+							}
+						}
+					})
+				}
+			})
+		} else {
+			limpiar();
+			$('#codigo').focus().select()
+		}
+	}
+
+	function cargarExixtencia() {
+		if($('#artXCargar').DataTable().rows().count()>0) {
+			msg.fire({
+				title: '!!! A T E N C I Ó N ¡¡¡',
+				icon: 'question',
+				html: 'Desea Procesar la información ingresada?',
+				onOpen: function() { $('.swal2-cancel').focus() },
+			}).then((result) => {
+				if (result.value) {
+					cargando2('show');
+					var codigo = [];
+					$('#artXCargar').DataTable().rows().data().each(function(data){
+						codigo.push(data.codigo)
+					})
+					$.ajax({
+						url: "app/controller/cargar_inventario.php",
+						data: {
+							opcion: "cargarExixtencia",
+							usuario: $('#uilogin').val(),
+							codigo: codigo.toString(),
+							organizacion: organizacion,
+							localidad: localidad
+						},
+						type: "POST",
+						dataType: "text",
+						success : function(data) {
+							if(data!='1') {
+								msg.fire({
+									title: '!!! A T E N C I Ó N ¡¡¡',
+									icon: 'error',
+									html: 'No se realizó la actualización<br>'+data,
+									showCancelButton: false,
+								})
+							} else {
+								cargando2('hide');
+								cargarcontenido('cargar_inventario');
+							}
+						}
+					});
+				}
+			})
+		}
+	}
+
+	function selArt(codigo, descripcion, cod_almacen, disponible, permitido) {
+		$('#TblBuscarArt').modal('hide');
+		$('#codigo').val(codigo);
+		$('#descripcion').val(descripcion);
+		$('#select_almacenes').val(cod_almacen);
+		$('#permitido').val(permitido);
+		setTimeout(function() {
+			$('#cantidad').focus().select();
+		}, 150);
+	}
+
+	function validar() {
+		var errores = [];
+		var focus = '';
+		if($('#codigo').val()=='' || $('#descripcion').val().trim()=='') {
+			errores.push('Primero de consultar un artículo, ingresando el código '+
+				'o el nombre parcial o completo del artículo y presionando el botón consultar');
+			focus = focus==''?'codigo':focus;
+		}
+		if($('#select_almacenes').val()=='0') {
+			errores.push('Debe seleccionar un almacén');
+			focus = focus==''?'select_almacenes':focus;
+		}
+		if(($('#cantidad').val()+$('#permitido').val())<=0) {
+			errores.push('Debe ingresar una <b>cantidad</b> o <b>permitido</b> mayor a cero (0)');
+			focus = focus==''?'cantidad':focus;
+		}
+		if($('#permitido').val()<0) {
+			errores.push('Debe ingresar una cantidad permitida mayor o igual a cero (0)');
+			focus = focus==''?'permitido':focus;
+		}
+		if(errores.length>0) {
+			var mensaje = ''
+			errores.forEach(error => {
+				mensaje += '<div class="w-100 text-left"><i class="fas fa-times text-danger"></i> ' + error + '</div>';
+			});
+			msg.fire({
+				title: '!!! A T E N C I Ó N ¡¡¡',
+				icon: 'error',
+				html: 'Por favor corrija la siguiente información<br>'+mensaje,
+				showCancelButton: false,
+				onAfterClose: function() { $('#'+focus).focus(); }
+			}).then((result) => {
+				if (result.value) {
+					return false;
+				}
+			})
+		} else {
+			return true;
+		}
+	}
+
+	function modCantidad(codigo, valor) {
+		data.map(function(dato) {
+			if(dato.codigo == codigo){
+				dato.cantidad = valor*1;
+			}
+
+			return dato;
+		});
+		$.ajax({
+			url: "app/controller/prefactura.php",
+			data: {
+				opcion: "modCantidadTmp",
+				idpara: $('#idtemporal').val()+'¬'+codigo+'¬'+valor,
+			},
+			type: "POST",
+			dataType: "json",
+		});
+		calTotales();
+	}
+
+	function modificaCant(nrodoc, codigo, valor, nombre, step, max) {
+		msg.fire({
+			title: 'Modificar Cantidad',
+			icon: 'question',
+			html: 'Modificar Cantidad de:<br><b>'+nombre+'</b><br>Disponible: <b>'+max+'</b>',
+			input: 'number',
+			inputValue: $('#url'+codigo).html(),
+			inputAttributes: {
+				autocapitalize: 'off',
+				max: max,
+				min: step,
+				step: step
+			},
+			inputValidator: (value) => {
+				if (value>max) {
+					return 'Cantidad Disponible: <b>[ ' + max + ' ]</b>';
+				}
+			}
+		}).then((result) => {
+			if (result.value) {
+				modCantidad(codigo, result.value);
+				$('#url'+codigo).html(result.value);
+			}
+		})
+	}
+
+	function infoextra(d) {
+		var ret = '<table class="w-100 m-0 p-0" cellspacing="0" cellpadding="0">'+
+					'<tr><td class="w-50 m-0 p-0"><span class="mbadge"><b>Almacen: </b>'+d.almacen+'</span></td>'+
+					'<td class="w-50 m-0 p-0"><span class="mbadge"><b>Permitido: </b>'+d.permitido+'</span></td></tr>'+
+				   '</table>';
+		return ret;
+	}
+</script>
